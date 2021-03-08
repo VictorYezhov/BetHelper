@@ -42,8 +42,8 @@ class InputBetViewModel : ViewModel() {
 
             for (i in gameDataResponse ?: ArrayList()){
 
-                val homeTeam = i.teams[0]
-                val awayTeam = i.teams[1]
+                val homeTeam = i.home_team
+                val awayTeam = if(i.teams[0] == homeTeam) i.teams[1] else i.teams[0]
 
                 val winCoefficient = i.sites[0].odds.h2h[0]
                 val loseCoefficient = i.sites[0].odds.h2h[1]
@@ -55,7 +55,7 @@ class InputBetViewModel : ViewModel() {
                     (jw.similarity(it.home_team.toLowerCase(), homeTeam.toLowerCase()) > 0.7 && jw.similarity(it.away_team.toLowerCase(), awayTeam.toLowerCase()) > 0.7) ||
                             (jw.similarity(it.home_team.toLowerCase(), awayTeam.toLowerCase()) > 0.7 && jw.similarity(it.away_team.toLowerCase(), homeTeam.toLowerCase()) > 0.7)
                 }?.let {
-                    val match = Match(Team(homeTeam), Team(awayTeam), it.probabilities.winHomeTeam.toFloat(), it.probabilities.winAwayTeam.toFloat(), it.probabilities.draw.toFloat(), winCoefficient, loseCoefficient, drawCoefficient)
+                    val match = Match(Team(homeTeam), Team(awayTeam), it.probabilities.winHomeTeam.toFloat(), it.probabilities.winAwayTeam.toFloat(), it.probabilities.draw.toFloat(), winCoefficient, loseCoefficient, drawCoefficient, it.start_date)
                     matches.add(match)
                 }
 

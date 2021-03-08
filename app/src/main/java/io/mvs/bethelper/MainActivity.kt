@@ -28,13 +28,6 @@ class MainActivity : AppCompatActivity() {
 
         val matches = ArrayList<Match>()
 
-        matches.add(Match(Team("Schalke"), Team("Mainz"), 0.3f, 0.7f,0f, 0f, 6.6f, 2.82f))
-        matches.add(Match(Team("Barcelona"), Team("Saski Baskonia"), 0.80f, 0.2f,0f, 1.2f, 5f, 6.37f))
-        matches.add(Match(Team("Valencia"), Team("Villarreal"), 0.25f, 0.75f,0f, 1.25f, 11f, 1.34f))
-        matches.add(Match(Team("Huddersfield Town"), Team("Cardiff City"), 0.4f, 0.6f, 0f,0f, 4.97f, 2.82f))
-        matches.forEach {
-            Log.i("MATCH:", "$it")
-        }
         val data = analyzer.performAnalysts(matches)
 
         data.forEach {

@@ -19,7 +19,7 @@ class BetDataAdapter(private val items : ArrayList<BetData>, private  val betSiz
 
 
         holder.itemView.match_value.text = "${data.targetMatch.homeTeam.name} vs ${data.targetMatch.awayTeam.name}"
-        holder.itemView.date_value.text = "30.08.1998 15:45"
+        holder.itemView.date_value.text = data.targetMatch.date
         holder.itemView.betPart.text = "${Math.round(betSize * data.proposedBetPart)}"
         holder.itemView.win_team_name.text = "${data.winningTeam.name}"
     }
