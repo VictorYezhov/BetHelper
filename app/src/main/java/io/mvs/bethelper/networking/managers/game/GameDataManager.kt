@@ -1,4 +1,4 @@
-package io.mvs.bethelper.networking.managers
+package io.mvs.bethelper.networking.managers.game
 
 import io.mvs.bethelper.data.ResponseOdd
 

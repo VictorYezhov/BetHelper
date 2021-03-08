@@ -1,4 +1,4 @@
-package io.mvs.bethelper.networking.managers
+package io.mvs.bethelper.networking.managers.game
 
 import io.mvs.bethelper.BuildConfig
 import io.mvs.bethelper.data.ResponseOdd
@@ -10,7 +10,7 @@ class GameDataManagerImpl : GameDataManager, BaseApiConnector<GameDataApi>(GameD
     override suspend fun getGameData(
     ): ResponseOdd? {
         return try {
-            apiClient.getGameData("soccer_epl", "eu", "h2h", "iso", Constants.apiKey)
+            apiClient.getGameData("soccer", "eu", "h2h", "iso", Constants.apiKey)
         } catch (ex : Exception){
             null
         }
