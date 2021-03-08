@@ -1,5 +1,6 @@
 package io.mvs.bethelper.service
 
+import android.util.Log
 import io.mvs.bethelper.data.BetData
 import io.mvs.bethelper.data.Match
 import kotlin.math.abs
@@ -29,9 +30,12 @@ class BetAnalyzer {
         val betData = ArrayList<BetData>()
 
         matches.forEach { match ->
-            if(match.homeTeamCoefficient > match.awayTeamCoefficient){
+            Log.i("BetAnalyzer", "Home: ${match.homeTeamCoefficient} Away: ${match.awayTeamCoefficient}")
+            if(match.homeWinPercent > match.awayWinPercent){
+                Log.i("BetAnalyzer", "Choosing Home Team: ${match.homeTeam.name} ")
                 betData.add(BetData(match, match.homeTeam, match.homeWinPercent, match.homeTeamCoefficient))
             }else{
+                Log.i("BetAnalyzer", "Choosing Away Team: ${match.awayTeam.name} ")
                 betData.add(BetData(match, match.awayTeam, match.awayWinPercent, match.awayTeamCoefficient))
             }
 
