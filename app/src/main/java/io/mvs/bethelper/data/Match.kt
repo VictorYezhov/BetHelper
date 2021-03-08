@@ -7,5 +7,6 @@ data class Match(
     val awayWinPercent : Float,
     val drawPercent : Float,
     val homeTeamCoefficient : Float,
-    val awayTeamCoefficient : Float
+    val awayTeamCoefficient : Float,
+    val drawCoefficient : Float
 )

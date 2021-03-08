@@ -31,6 +31,16 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
+    flavorDimensions "bet_helper"
+    productFlavors {
+        qa {
+            dimension "bet_helper"
+            versionNameSuffix "-qa"
+            buildConfigField "String", "BASE_URL", "\"https://api.the-odds-api.com/\""
+            buildConfigField "String", "FOOTBALL_PREDICTION", "\"https://football-prediction-api.p.rapidapi.com\""
+        }
+    }
 }
 
 dependencies {
