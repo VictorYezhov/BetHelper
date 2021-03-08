@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@id/inputBetFragment">
+
+    <fragment
+        android:id="@+id/inputBetFragment"
+        android:name="io.mvs.bethelper.modules.bet_analysis.InputBetFragment"
+        android:label="input_bet_fragment"
+        tools:layout="@layout/input_bet_fragment" >
+        <action
+            android:id="@+id/action_inputBetFragment_to_betStatsFragment"
+            app:destination="@id/betStatsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/betStatsFragment"
+        android:name="io.mvs.bethelper.modules.bet_stats.BetStatsFragment"
+        android:label="bet_stats_fragment"
+        tools:layout="@layout/bet_stats_fragment" />
+</navigation>

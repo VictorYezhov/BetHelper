@@ -20,7 +20,7 @@ class GamesViewModel : ViewModel(){
     val gamesLiveData = MutableLiveData<ArrayList<Match>>()
 
     init {
-        getGames()
+       // getGames()
     }
 
     private fun getGames(){

@@ -68,3 +68,14 @@ data class OutCome(
     var outComePercent : Float = 0f,
     var winAmount : Float = 0f
 )
+
+data class GeneralStats(
+    val totalWinPercent : Float,
+    val totalLosePercent : Float,
+    val maxWinAmount : Float,
+    val minWinAmount : Float,
+    val maxClearWinAmount : Float,
+    val minClearWinAmount : Float,
+    val maxLoseAmount : Float,
+    val minLoseAmount: Float
+)
