@@ -4,6 +4,8 @@ import io.mvs.bethelper.networking.managers.game.GameDataManager
 import io.mvs.bethelper.networking.managers.game.GameDataManagerImpl
 import io.mvs.bethelper.networking.managers.prediction.PredictionDataManager
 import io.mvs.bethelper.networking.managers.prediction.PredictionDataManagerImpl
+import io.mvs.bethelper.service.time.TimeService
+import io.mvs.bethelper.service.time.TimeServiceImpl
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
@@ -12,5 +14,6 @@ object KoinModules {
         val module = module {
                 single { GameDataManagerImpl() } bind GameDataManager::class
                 single { PredictionDataManagerImpl() } bind PredictionDataManager::class
+                single { TimeServiceImpl() } bind TimeService::class
         }
 }

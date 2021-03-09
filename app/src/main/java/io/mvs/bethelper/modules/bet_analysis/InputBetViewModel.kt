@@ -1,5 +1,6 @@
 package io.mvs.bethelper.modules.bet_analysis
 
+import android.text.format.DateUtils
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -7,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import info.debatty.java.stringsimilarity.JaroWinkler
 import io.mvs.bethelper.data.BetData
 import io.mvs.bethelper.data.Match
+import io.mvs.bethelper.data.PredictionData
 import io.mvs.bethelper.data.Team
 import io.mvs.bethelper.inject
 import io.mvs.bethelper.networking.managers.game.GameDataManager
@@ -15,6 +17,7 @@ import io.mvs.bethelper.service.BetAnalyzer
 import io.mvs.bethelper.service.GeneralStats
 import io.mvs.bethelper.service.OutCome
 import io.mvs.bethelper.service.OutcomeGenerator
+import io.mvs.bethelper.service.time.TimeService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -30,48 +33,52 @@ class InputBetViewModel : ViewModel() {
 
     private val gameDataManager : GameDataManager by inject()
     private val predictionDataManager : PredictionDataManager by inject()
+    private val timeService : TimeService by inject()
 
     val gamesLiveData = MutableLiveData<ArrayList<Match>>()
 
+    private val matchesMap = HashMap<String, PredictionData>()
     suspend fun getGames() : ArrayList<Match>{
 
-            val gameDataResponse =  gameDataManager.getGameData()?.data
+            //val gameDataResponse =  gameDataManager.getGameData()?.data
 
             val jw = JaroWinkler()
             val predictionDataResponse = predictionDataManager.getGameDataPrediction().data
 
+            predictionDataResponse.forEach {
+                matchesMap["${it.home_team}-${it.away_team}"] = it
+            }
             val matches = ArrayList<Match>()
 
-            for (i in gameDataResponse ?: ArrayList()){
+
+            predictionDataResponse.clear()
+            predictionDataResponse.addAll(matchesMap.values)
+
+            val filtered =  predictionDataResponse.filter {  !DateUtils.isToday(timeService.getTimeValueFromString(it.start_date, "yyyy-mm-dd'T'HH:mm:ss")) }
+            for (i in filtered ?: ArrayList()){
 
                 val homeTeam = i.home_team
-                var homeIndex = 0
-                val awayTeam = if(i.teams[0] == homeTeam)
-                {
-                    homeIndex = 0
-                    i.teams[1]
-                } else {
-                    homeIndex = 1
-                    i.teams[0]
-                }
+                val awayTeam = i.away_team
 
-                var bookmaker = i.sites.find { it.site_key == "onexbet"}
-                if (bookmaker == null) bookmaker = i.sites[0]
+                val homeTeamCoefficient = i.odds.homeTeamWinCoefficient
+                val awayTeamCoefficient = i.odds.awayTeamWinCoefficient
+                val drawCoefficient = i.odds.drawCoefficient
 
-                val homeTeamCoefficient = bookmaker.odds.h2h[homeIndex]
-                val awayTeamCoefficient = bookmaker.odds.h2h[if(homeIndex == 0) 1 else 0]
-                val drawCoefficient = if (bookmaker.odds.h2h.size == 3) bookmaker.odds.h2h[2] else 0f
 
-                predictionDataResponse.find {
-                    (jw.similarity(it.home_team.toLowerCase(), homeTeam.toLowerCase()) > 0.7 && jw.similarity(it.away_team.toLowerCase(), awayTeam.toLowerCase()) > 0.7) ||
-                            (jw.similarity(it.home_team.toLowerCase(), awayTeam.toLowerCase()) > 0.7 && jw.similarity(it.away_team.toLowerCase(), homeTeam.toLowerCase()) > 0.7)
-                }?.let {
-                    val match = Match(Team(homeTeam), Team(awayTeam), it.probabilities.winHomeTeam.toFloat(), it.probabilities.winAwayTeam.toFloat(), it.probabilities.draw.toFloat(), homeTeamCoefficient, awayTeamCoefficient, drawCoefficient, it.start_date, bookmaker.site_nice)
-                    matches.add(match)
-                }
+
+                val match = Match(Team(homeTeam), Team(awayTeam), i.probabilities.winHomeTeam.toFloat(), i.probabilities.winAwayTeam.toFloat(), i.probabilities.draw.toFloat(), homeTeamCoefficient.toFloat(), awayTeamCoefficient.toFloat(), drawCoefficient.toFloat(), i.start_date)
+                matches.add(match)
+
+//                predictionDataResponse.find {
+//                    (jw.similarity(it.home_team.toLowerCase(), homeTeam.toLowerCase()) > 0.7 && jw.similarity(it.away_team.toLowerCase(), awayTeam.toLowerCase()) > 0.7) ||
+//                            (jw.similarity(it.home_team.toLowerCase(), awayTeam.toLowerCase()) > 0.7 && jw.similarity(it.away_team.toLowerCase(), homeTeam.toLowerCase()) > 0.7)
+//                }?.let {
+
+                //}
 
             }
 
+        System.err.println(matches)
             gamesLiveData.postValue(matches)
         return  matches
 

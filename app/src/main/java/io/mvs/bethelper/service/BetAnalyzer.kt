@@ -9,7 +9,7 @@ class BetAnalyzer {
 
     companion object{
         private const val DIFFERENCE_MARGIN = 0.2f
-        private const val BETTING_AMOUNT = 5
+        private const val BETTING_AMOUNT = 3
     }
 
 
@@ -31,7 +31,6 @@ class BetAnalyzer {
         if(filtred.size > BETTING_AMOUNT){
            filtred = filtred.subList(0, BETTING_AMOUNT)
         }
-        println(filtred)
         return ArrayList(filtred)
     }
 
@@ -39,12 +38,9 @@ class BetAnalyzer {
         val betData = ArrayList<BetData>()
 
         matches.forEach { match ->
-            Log.i("BetAnalyzer", "Home: ${match.homeTeamCoefficient} Away: ${match.awayTeamCoefficient}")
             if(match.homeWinPercent > match.awayWinPercent){
-                Log.i("BetAnalyzer", "Choosing Home Team: ${match.homeTeam.name} ")
                 betData.add(BetData(match, match.homeTeam, match.homeWinPercent, match.homeTeamCoefficient))
             }else{
-                Log.i("BetAnalyzer", "Choosing Away Team: ${match.awayTeam.name} ")
                 betData.add(BetData(match, match.awayTeam, match.awayWinPercent, match.awayTeamCoefficient))
             }
 
