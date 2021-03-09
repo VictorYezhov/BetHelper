@@ -40,17 +40,22 @@ class OutcomeGenerator {
                 if(b){
                     percent *= when(outcome.games[index].betType){
                         BetType.WINNER -> outcome.games[index].winningPercentage
-                        BetType.WINNER_OR_DRAW -> (outcome.games[index].winningPercentage + outcome.games[index].targetMatch.drawPercent )
+                        BetType.WINNER_OR_DRAW -> (outcome.games[index].winOrDrawPercentage )
                     }
                     val betPart = outcome.games[index].proposedBetPart * betSize
-                    winningAmount += (betPart * outcome.games[index].coefficient)
+
+
+                    winningAmount += when(outcome.games[index].betType){
+                        BetType.WINNER -> (betPart * outcome.games[index].coefficient)
+                        BetType.WINNER_OR_DRAW -> ((betPart * outcome.games[index].winOrDrawCoefficient))
+                    }
 //                    println("Bet Part: $betPart")
 //                    println("winning: ${(betPart * outcome.games[index].coefficient)}")
 //                    println("Total: $winningAmount")
                 }else{
                     percent *= when(outcome.games[index].betType){
                         BetType.WINNER -> (1-outcome.games[index].winningPercentage)
-                        BetType.WINNER_OR_DRAW ->(1 - (outcome.games[index].winningPercentage + outcome.games[index].targetMatch.drawPercent ))
+                        BetType.WINNER_OR_DRAW ->(1 - (outcome.games[index].winOrDrawPercentage ))
                     }
                 }
             }

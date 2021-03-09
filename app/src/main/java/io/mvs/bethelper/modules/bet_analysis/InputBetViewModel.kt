@@ -56,17 +56,16 @@ class InputBetViewModel : ViewModel() {
 
             val filtered =  predictionDataResponse.filter{DateUtils.isToday(timeService.getTimeValueFromString(it.start_date, "yyyy-MM-dd'T'hh:mm:ss"))}//.filter {  it.start_date.contains(timeService.getTimeStringFromLong("yyyy-MM-dd", System.currentTimeMillis())) }
             for (i in filtered ?: ArrayList()){
-
-                val homeTeam = i.home_team
-                val awayTeam = i.away_team
-
-                val homeTeamCoefficient = i.odds.homeTeamWinCoefficient
-                val awayTeamCoefficient = i.odds.awayTeamWinCoefficient
-                val drawCoefficient = i.odds.drawCoefficient
-
-
-
-                val match = Match(Team(homeTeam), Team(awayTeam), i.probabilities.winHomeTeam.toFloat(), i.probabilities.winAwayTeam.toFloat(), i.probabilities.draw.toFloat(), homeTeamCoefficient.toFloat(), awayTeamCoefficient.toFloat(), drawCoefficient.toFloat(), i.start_date)
+                val match = Match(Team(i.home_team),
+                    Team(i.away_team),
+                    i.probabilities.winHomeTeam.toFloat(),
+                    i.probabilities.winAwayTeam.toFloat(),
+                    i.probabilities.draw.toFloat(),
+                    i.odds.homeTeamWinCoefficient.toFloat(),
+                    i.odds.awayTeamWinCoefficient.toFloat(),
+                    i.odds.drawCoefficient.toFloat(),
+                    i.odds.homeTeamWinOrDrawCoefficient.toFloat(),
+                    i.odds.awayTeamWinOrDrawCoefficient.toFloat(), i.start_date)
                 matches.add(match)
 
 //                predictionDataResponse.find {

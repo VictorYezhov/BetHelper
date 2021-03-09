@@ -46,10 +46,10 @@ class BetAnalyzer {
             Log.i("BetAnalyzer", "Home: ${match.homeTeamCoefficient} Away: ${match.awayTeamCoefficient}")
             if(match.homeWinPercent > match.awayWinPercent){
                 Log.i("BetAnalyzer", "Choosing Home Team: ${match.homeTeam.name} ")
-                betData.add(BetData(match, match.homeTeam, betType, match.homeWinPercent, match.homeTeamCoefficient))
+                betData.add(BetData(match, match.homeTeam, betType, match.homeWinPercent, match.homeTeamCoefficient, match.homeWinPercent + match.drawPercent, match.homeTeamWinOrDrawCoefficient))
             }else{
                 Log.i("BetAnalyzer", "Choosing Away Team: ${match.awayTeam.name} ")
-                betData.add(BetData(match, match.awayTeam, betType, match.awayWinPercent, match.awayTeamCoefficient))
+                betData.add(BetData(match, match.awayTeam, betType, match.awayWinPercent, match.awayTeamCoefficient, match.awayWinPercent+match.drawPercent, match.awayTeamWinOrDrawCoefficient))
             }
 
         }
@@ -62,14 +62,14 @@ class BetAnalyzer {
         matches.forEach {
             winningPercentSum += when(it.betType){
                 BetType.WINNER -> (it.winningPercentage)
-                BetType.WINNER_OR_DRAW -> (it.winningPercentage + it.targetMatch.drawCoefficient)
+                BetType.WINNER_OR_DRAW -> (it.winOrDrawPercentage)
             }
         }
 
         matches.forEach {
             it.winningPercentCoefficient = when(it.betType){
                 BetType.WINNER -> it.winningPercentage / winningPercentSum
-                BetType.WINNER_OR_DRAW -> (it.winningPercentage + it.targetMatch.drawPercent) / winningPercentSum
+                BetType.WINNER_OR_DRAW -> (it.winOrDrawPercentage) / winningPercentSum
             }
         }
         return  matches
@@ -80,14 +80,14 @@ class BetAnalyzer {
         matches.forEach {
             bettingSum += when(it.betType){
                 BetType.WINNER -> it.coefficient
-                BetType.WINNER_OR_DRAW -> (it.coefficient + it.targetMatch.drawCoefficient)
+                BetType.WINNER_OR_DRAW -> (it.winOrDrawCoefficient)
             }
 
         }
         matches.forEach {
             it.bettingCoefficient = when(it.betType){
             BetType.WINNER -> it.coefficient / bettingSum
-            BetType.WINNER_OR_DRAW -> (it.coefficient + it.targetMatch.drawCoefficient) / bettingSum
+            BetType.WINNER_OR_DRAW -> (it.winOrDrawCoefficient) / bettingSum
         }
         }
         return  matches
