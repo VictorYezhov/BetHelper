@@ -2,6 +2,7 @@ package io.mvs.bethelper.service
 
 import android.util.Log
 import io.mvs.bethelper.data.BetData
+import io.mvs.bethelper.data.BetType
 import java.util.*
 import java.util.stream.Collectors
 import java.util.stream.IntStream
@@ -19,7 +20,7 @@ class OutcomeGenerator {
         val outcomes = ArrayList<OutCome>()
         var index = 0
         possibleResults.forEach {
-            outcomes.add(OutCome(possibleResults = possibleResults[index].toList(), games =  betData))
+            outcomes.add(OutCome(possibleResults = possibleResults[index].toList(), betData))
             index++
         }
 
@@ -30,8 +31,6 @@ class OutcomeGenerator {
 
     private fun calculatePossibleOutComes(outcomes : ArrayList<OutCome>, betSize: Float){
 
-        var positiveOutComes = 0
-        var negativeOutComes = 0
 
         outcomes.forEach { outcome->
 
@@ -39,28 +38,27 @@ class OutcomeGenerator {
             var winningAmount = 0f;
             outcome.possibleResults.forEachIndexed { index, b ->
                 if(b){
-                    percent *= outcome.games[index].winningPercentage
+                    percent *= when(outcome.games[index].betType){
+                        BetType.WINNER -> outcome.games[index].winningPercentage
+                        BetType.WINNER_OR_DRAW -> (outcome.games[index].winningPercentage + outcome.games[index].targetMatch.drawPercent )
+                    }
                     val betPart = outcome.games[index].proposedBetPart * betSize
-                    winningAmount += (betPart * outcome.games[index].coefficient)
+                    winningAmount += (betPart * outcome.games[index].targetMatch.drawCoefficient)
 //                    println("Bet Part: $betPart")
 //                    println("winning: ${(betPart * outcome.games[index].coefficient)}")
 //                    println("Total: $winningAmount")
                 }else{
-                    percent *= (1-(outcome.games[index].winningPercentage))
+                    percent *= when(outcome.games[index].betType){
+                        BetType.WINNER -> (1-outcome.games[index].winningPercentage)
+                        BetType.WINNER_OR_DRAW ->(1 - (outcome.games[index].winningPercentage + outcome.games[index].targetMatch.drawPercent ))
+                    }
                 }
             }
             outcome.winAmount = (winningAmount - betSize)
-            if(outcome.winAmount > 0){
-                positiveOutComes++
-            }else{
-                negativeOutComes++
-            }
             outcome.outComePercent = percent
-          //  printOutCome(outcome)
+         //   printOutCome(outcome)
 
         }
-
-        Log.i("OutcomeGenerator", "Positive: $positiveOutComes  Negative: $negativeOutComes")
 
     }
 

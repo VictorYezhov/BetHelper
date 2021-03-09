@@ -2,6 +2,7 @@ package io.mvs.bethelper.service
 
 import android.util.Log
 import io.mvs.bethelper.data.BetData
+import io.mvs.bethelper.data.BetType
 import io.mvs.bethelper.data.Match
 import kotlin.math.abs
 
@@ -13,8 +14,12 @@ class BetAnalyzer {
     }
 
 
-    fun performAnalysts(matches :  ArrayList<Match>) : ArrayList<BetData>{
-        return calculateProposedPart(calculateBettingCoefficient(calculateWinningPercentCoefficient(composeBetData(filterMostProbable(matches)))))
+    fun performWinLoseAnalysis(matches :  ArrayList<Match>) : ArrayList<BetData>{
+        return calculateProposedPart(calculateBettingCoefficient(calculateWinningPercentCoefficient(composeBetData(filterMostProbable(matches), BetType.WINNER))))
+    }
+
+    fun performWinLoseDrawAnalysis(matches :  ArrayList<Match>) : ArrayList<BetData>{
+        return calculateProposedPart(calculateBettingCoefficient(calculateWinningPercentCoefficient(composeBetData(filterMostProbable(matches), BetType.WINNER_OR_DRAW))))
     }
 
 
@@ -23,7 +28,6 @@ class BetAnalyzer {
 //        if(filtred.size < BETTING_AMOUNT){
 //            filtred =  matches.filter { match -> abs(match.homeWinPercent - match.awayWinPercent) > DIFFERENCE_MARGIN - 0.05}
 //        }
-
         filtred = filtred.sortedBy { match -> -1*abs(match.homeWinPercent - match.awayWinPercent)  }
         filtred.forEach { match->
             Log.i("BetAnalyzer", "Propability difference: ${abs(match.homeWinPercent - match.awayWinPercent)}")
@@ -35,14 +39,17 @@ class BetAnalyzer {
         return ArrayList(filtred)
     }
 
-    private fun composeBetData(matches :  ArrayList<Match>) :  ArrayList<BetData>{
+    private fun composeBetData(matches :  ArrayList<Match>, betType: BetType) :  ArrayList<BetData>{
         val betData = ArrayList<BetData>()
 
         matches.forEach { match ->
+            Log.i("BetAnalyzer", "Home: ${match.homeTeamCoefficient} Away: ${match.awayTeamCoefficient}")
             if(match.homeWinPercent > match.awayWinPercent){
-                betData.add(BetData(match, match.homeTeam, match.homeWinPercent, match.homeTeamCoefficient))
+                Log.i("BetAnalyzer", "Choosing Home Team: ${match.homeTeam.name} ")
+                betData.add(BetData(match, match.homeTeam, betType, match.homeWinPercent, match.homeTeamCoefficient))
             }else{
-                betData.add(BetData(match, match.awayTeam, match.awayWinPercent, match.awayTeamCoefficient))
+                Log.i("BetAnalyzer", "Choosing Away Team: ${match.awayTeam.name} ")
+                betData.add(BetData(match, match.awayTeam, betType, match.awayWinPercent, match.awayTeamCoefficient))
             }
 
         }
@@ -53,10 +60,17 @@ class BetAnalyzer {
     private fun calculateWinningPercentCoefficient(matches :  ArrayList<BetData>) :  ArrayList<BetData>{
         var winningPercentSum = 0f
         matches.forEach {
-            winningPercentSum+= it.winningPercentage
+            winningPercentSum += when(it.betType){
+                BetType.WINNER -> (it.winningPercentage)
+                BetType.WINNER_OR_DRAW -> (it.winningPercentage + it.targetMatch.drawCoefficient)
+            }
         }
+
         matches.forEach {
-            it.winningPercentCoefficient = it.winningPercentage / winningPercentSum
+            it.winningPercentCoefficient = when(it.betType){
+                BetType.WINNER -> it.winningPercentage / winningPercentSum
+                BetType.WINNER_OR_DRAW -> (it.winningPercentage + it.targetMatch.drawPercent) / winningPercentSum
+            }
         }
         return  matches
     }
@@ -64,10 +78,17 @@ class BetAnalyzer {
     private fun calculateBettingCoefficient(matches :  ArrayList<BetData>) :  ArrayList<BetData>{
         var bettingSum = 0f
         matches.forEach {
-            bettingSum+= it.coefficient
+            bettingSum += when(it.betType){
+                BetType.WINNER -> it.coefficient
+                BetType.WINNER_OR_DRAW -> (it.coefficient + it.targetMatch.drawCoefficient)
+            }
+
         }
         matches.forEach {
-            it.bettingCoefficient= it.coefficient / bettingSum
+            it.bettingCoefficient = when(it.betType){
+            BetType.WINNER -> it.coefficient / bettingSum
+            BetType.WINNER_OR_DRAW -> (it.coefficient + it.targetMatch.drawCoefficient) / bettingSum
+        }
         }
         return  matches
     }
@@ -82,7 +103,6 @@ class BetAnalyzer {
         matches.forEach {
             it.proposedBetPart= it.generalCoefficient / totalGeneralCoefficient
         }
-
 
         return matches
     }

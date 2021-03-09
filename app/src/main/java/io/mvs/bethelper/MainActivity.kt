@@ -7,13 +7,9 @@ import androidx.lifecycle.observe
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import io.mvs.bethelper.data.Match
-import io.mvs.bethelper.data.Team
 import io.mvs.bethelper.service.BetAnalyzer
 import io.mvs.bethelper.service.OutCome
 import io.mvs.bethelper.service.OutcomeGenerator
-import java.util.*
-import java.util.stream.Collectors.toList
-import java.util.stream.IntStream
 import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
@@ -28,7 +24,7 @@ class MainActivity : AppCompatActivity() {
 
         val matches = ArrayList<Match>()
 
-        val data = analyzer.performAnalysts(matches)
+        val data = analyzer.performWinLoseAnalysis(matches)
 
         data.forEach {
             Log.i(
