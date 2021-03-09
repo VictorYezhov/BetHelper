@@ -38,15 +38,32 @@ class OutcomeGenerator {
             outcome.possibleResults.forEachIndexed { index, b ->
                 if(b){
                     percent *= outcome.games[index].winningPercentage
-                    winningAmount += ((outcome.games[index].proposedBetPart * betSize) * outcome.games[index].coefficient)
+                    val betPart = outcome.games[index].proposedBetPart * betSize
+
+
+                    winningAmount += (betPart * outcome.games[index].coefficient)
+//                    println("Bet Part: $betPart")
+//                    println("winning: ${(betPart * outcome.games[index].coefficient)}")
+//                    println("Total: $winningAmount")
                 }else{
                     percent *= (1-outcome.games[index].winningPercentage)
                 }
             }
             outcome.winAmount = (winningAmount - betSize)
             outcome.outComePercent = percent
+         //   printOutCome(outcome)
+
         }
 
+    }
+
+    fun printOutCome(outCome: OutCome) {
+        println(" ")
+        outCome.games.forEachIndexed { index, betData ->
+            println("${betData.winningTeam.name} ${betData.winningPercentage * 100}%  ${if (outCome.possibleResults[index]) "win" else "lose"} ")
+        }
+        println("Total win: ${outCome.winAmount}")
+        println("OutCome percent: ${outCome.outComePercent * 100}%")
     }
 
     private fun bitSetToArray(bs: BitSet, width: Int): BooleanArray {

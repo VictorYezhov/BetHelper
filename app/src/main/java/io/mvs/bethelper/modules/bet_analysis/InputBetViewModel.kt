@@ -17,6 +17,7 @@ import io.mvs.bethelper.service.OutCome
 import io.mvs.bethelper.service.OutcomeGenerator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 class InputBetViewModel : ViewModel() {
 
@@ -36,6 +37,7 @@ class InputBetViewModel : ViewModel() {
 
             val gameDataResponse =  gameDataManager.getGameData()?.data
 
+            val jw = JaroWinkler()
             val predictionDataResponse = predictionDataManager.getGameDataPrediction().data
 
             val matches = ArrayList<Match>()
@@ -43,19 +45,27 @@ class InputBetViewModel : ViewModel() {
             for (i in gameDataResponse ?: ArrayList()){
 
                 val homeTeam = i.home_team
-                val awayTeam = if(i.teams[0] == homeTeam) i.teams[1] else i.teams[0]
+                var homeIndex = 0
+                val awayTeam = if(i.teams[0] == homeTeam)
+                {
+                    homeIndex = 0
+                    i.teams[1]
+                } else {
+                    homeIndex = 1
+                    i.teams[0]
+                }
 
-                val winCoefficient = i.sites[0].odds.h2h[0]
-                val loseCoefficient = i.sites[0].odds.h2h[1]
+                val homeTeamCoefficient = i.sites[0].odds.h2h[homeIndex]
+                val awayTeamCoefficient = i.sites[0].odds.h2h[if(homeIndex == 0) 1 else 0]
                 val drawCoefficient = if (i.sites[0].odds.h2h.size == 3) i.sites[0].odds.h2h[2] else 0f
 
-                val jw = JaroWinkler()
+
 
                 predictionDataResponse.find {
                     (jw.similarity(it.home_team.toLowerCase(), homeTeam.toLowerCase()) > 0.7 && jw.similarity(it.away_team.toLowerCase(), awayTeam.toLowerCase()) > 0.7) ||
                             (jw.similarity(it.home_team.toLowerCase(), awayTeam.toLowerCase()) > 0.7 && jw.similarity(it.away_team.toLowerCase(), homeTeam.toLowerCase()) > 0.7)
                 }?.let {
-                    val match = Match(Team(homeTeam), Team(awayTeam), it.probabilities.winHomeTeam.toFloat(), it.probabilities.winAwayTeam.toFloat(), it.probabilities.draw.toFloat(), winCoefficient, loseCoefficient, drawCoefficient, it.start_date)
+                    val match = Match(Team(homeTeam), Team(awayTeam), it.probabilities.winHomeTeam.toFloat(), it.probabilities.winAwayTeam.toFloat(), it.probabilities.draw.toFloat(), homeTeamCoefficient, awayTeamCoefficient, drawCoefficient, it.start_date)
                     matches.add(match)
                 }
 
@@ -83,7 +93,7 @@ class InputBetViewModel : ViewModel() {
         var totalWinPercent = 0f
         var maxClearWin = 0f
         var minClearWin = Int.MAX_VALUE.toFloat()
-        var minLose = Int.MAX_VALUE.toFloat()
+        var minLose = Int.MAX_VALUE.toFloat() * -1
 
 
         outComes.forEach { outCome->
@@ -98,7 +108,7 @@ class InputBetViewModel : ViewModel() {
                     minClearWin = outCome.winAmount
                 }
             }else{
-                if(outCome.winAmount < minLose){
+                if(outCome.winAmount > minLose){
                     minLose = outCome.winAmount
                 }
             }
@@ -107,12 +117,12 @@ class InputBetViewModel : ViewModel() {
 
         betStats.postValue(GeneralStats(totalWinPercent,
             1-totalWinPercent,
-            maxClearWin+betSize,
-            minClearWin+betSize,
-            maxClearWin,
-            minClearWin,
-            betSize.toFloat(),
-            minLose))
+            (maxClearWin + betSize).roundToInt().toFloat(),
+            (minClearWin+betSize).roundToInt().toFloat(),
+            maxClearWin.roundToInt().toFloat(),
+            minClearWin.roundToInt().toFloat(),
+            betSize.toFloat().roundToInt().toFloat(),
+            minLose.roundToInt().toFloat()))
     }
 
 

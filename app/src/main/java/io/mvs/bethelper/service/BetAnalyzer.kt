@@ -20,9 +20,14 @@ class BetAnalyzer {
 
     private fun filterMostProbable(matches :  ArrayList<Match>) : ArrayList<Match>{
        var filtred =  matches.filter { match -> abs(match.homeWinPercent - match.awayWinPercent) > DIFFERENCE_MARGIN}
+        filtred = filtred.sortedBy { match -> -1*abs(match.homeWinPercent - match.awayWinPercent)  }
+        filtred.forEach { match->
+            Log.i("BetAnalyzer", "Propability difference: ${abs(match.homeWinPercent - match.awayWinPercent)}")
+        }
         if(filtred.size > BETTING_AMOUNT){
            filtred = filtred.subList(0, BETTING_AMOUNT)
         }
+        println(filtred)
         return ArrayList(filtred)
     }
 
