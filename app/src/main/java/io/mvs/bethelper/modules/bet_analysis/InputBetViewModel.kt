@@ -88,7 +88,7 @@ class InputBetViewModel : ViewModel() {
         this.betSize = betSize
         viewModelScope.launch(Dispatchers.IO){
             val matches = getGames()
-            val data = analyzer.performWinLoseDrawAnalysis(matches)
+            val data = analyzer.performWinLoseAnalysis(matches)
             betData.postValue(data)
             val outComesData = statsGenerator.calculateOutcome(data, betSize.toFloat())
             outComes.postValue(outComesData)

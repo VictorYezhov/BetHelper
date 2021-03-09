@@ -43,7 +43,7 @@ class OutcomeGenerator {
                         BetType.WINNER_OR_DRAW -> (outcome.games[index].winningPercentage + outcome.games[index].targetMatch.drawPercent )
                     }
                     val betPart = outcome.games[index].proposedBetPart * betSize
-                    winningAmount += (betPart * outcome.games[index].targetMatch.drawCoefficient)
+                    winningAmount += (betPart * outcome.games[index].coefficient)
 //                    println("Bet Part: $betPart")
 //                    println("winning: ${(betPart * outcome.games[index].coefficient)}")
 //                    println("Total: $winningAmount")
