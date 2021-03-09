@@ -55,17 +55,18 @@ class InputBetViewModel : ViewModel() {
                     i.teams[0]
                 }
 
-                val homeTeamCoefficient = i.sites[0].odds.h2h[homeIndex]
-                val awayTeamCoefficient = i.sites[0].odds.h2h[if(homeIndex == 0) 1 else 0]
-                val drawCoefficient = if (i.sites[0].odds.h2h.size == 3) i.sites[0].odds.h2h[2] else 0f
+                var bookmaker = i.sites.find { it.site_key == "onexbet"}
+                if (bookmaker == null) bookmaker = i.sites[0]
 
-
+                val homeTeamCoefficient = bookmaker.odds.h2h[homeIndex]
+                val awayTeamCoefficient = bookmaker.odds.h2h[if(homeIndex == 0) 1 else 0]
+                val drawCoefficient = if (bookmaker.odds.h2h.size == 3) bookmaker.odds.h2h[2] else 0f
 
                 predictionDataResponse.find {
                     (jw.similarity(it.home_team.toLowerCase(), homeTeam.toLowerCase()) > 0.7 && jw.similarity(it.away_team.toLowerCase(), awayTeam.toLowerCase()) > 0.7) ||
                             (jw.similarity(it.home_team.toLowerCase(), awayTeam.toLowerCase()) > 0.7 && jw.similarity(it.away_team.toLowerCase(), homeTeam.toLowerCase()) > 0.7)
                 }?.let {
-                    val match = Match(Team(homeTeam), Team(awayTeam), it.probabilities.winHomeTeam.toFloat(), it.probabilities.winAwayTeam.toFloat(), it.probabilities.draw.toFloat(), homeTeamCoefficient, awayTeamCoefficient, drawCoefficient, it.start_date)
+                    val match = Match(Team(homeTeam), Team(awayTeam), it.probabilities.winHomeTeam.toFloat(), it.probabilities.winAwayTeam.toFloat(), it.probabilities.draw.toFloat(), homeTeamCoefficient, awayTeamCoefficient, drawCoefficient, it.start_date, bookmaker.site_nice)
                     matches.add(match)
                 }
 
