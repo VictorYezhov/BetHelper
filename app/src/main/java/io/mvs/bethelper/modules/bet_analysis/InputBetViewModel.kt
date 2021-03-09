@@ -54,7 +54,7 @@ class InputBetViewModel : ViewModel() {
             predictionDataResponse.clear()
             predictionDataResponse.addAll(matchesMap.values)
 
-            val filtered =  predictionDataResponse.filter {  !DateUtils.isToday(timeService.getTimeValueFromString(it.start_date, "yyyy-mm-dd'T'HH:mm:ss")) }
+            val filtered =  predictionDataResponse.filter{DateUtils.isToday(timeService.getTimeValueFromString(it.start_date, "yyyy-MM-dd'T'hh:mm:ss"))}//.filter {  it.start_date.contains(timeService.getTimeStringFromLong("yyyy-MM-dd", System.currentTimeMillis())) }
             for (i in filtered ?: ArrayList()){
 
                 val homeTeam = i.home_team
@@ -78,7 +78,7 @@ class InputBetViewModel : ViewModel() {
 
             }
 
-        System.err.println(matches)
+       // System.err.println(matches)
             gamesLiveData.postValue(matches)
         return  matches
 
@@ -99,6 +99,7 @@ class InputBetViewModel : ViewModel() {
     private fun calculateStats(outComes : ArrayList<OutCome>){
 
         var totalWinPercent = 0f
+        var totalLosePercent = 0f
         var maxClearWin = 0f
         var minClearWin = Int.MAX_VALUE.toFloat()
         var minLose = Int.MAX_VALUE.toFloat() * -1
@@ -119,12 +120,13 @@ class InputBetViewModel : ViewModel() {
                 if(outCome.winAmount > minLose){
                     minLose = outCome.winAmount
                 }
+                totalLosePercent += outCome.outComePercent
             }
         }
         Log.i("ANALISIs", "WIN: $totalWinPercent")
 
         betStats.postValue(GeneralStats(totalWinPercent,
-            1-totalWinPercent,
+            totalLosePercent,
             (maxClearWin + betSize).roundToInt().toFloat(),
             (minClearWin+betSize).roundToInt().toFloat(),
             maxClearWin.roundToInt().toFloat(),

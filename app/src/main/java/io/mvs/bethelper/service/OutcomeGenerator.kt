@@ -19,7 +19,7 @@ class OutcomeGenerator {
         val outcomes = ArrayList<OutCome>()
         var index = 0
         possibleResults.forEach {
-            outcomes.add(OutCome(possibleResults = possibleResults[index].toList(), betData))
+            outcomes.add(OutCome(possibleResults = possibleResults[index].toList(), games =  betData))
             index++
         }
 
@@ -30,6 +30,8 @@ class OutcomeGenerator {
 
     private fun calculatePossibleOutComes(outcomes : ArrayList<OutCome>, betSize: Float){
 
+        var positiveOutComes = 0
+        var negativeOutComes = 0
 
         outcomes.forEach { outcome->
 
@@ -39,21 +41,26 @@ class OutcomeGenerator {
                 if(b){
                     percent *= outcome.games[index].winningPercentage
                     val betPart = outcome.games[index].proposedBetPart * betSize
-
-
                     winningAmount += (betPart * outcome.games[index].coefficient)
 //                    println("Bet Part: $betPart")
 //                    println("winning: ${(betPart * outcome.games[index].coefficient)}")
 //                    println("Total: $winningAmount")
                 }else{
-                    percent *= (1-outcome.games[index].winningPercentage)
+                    percent *= (1-(outcome.games[index].winningPercentage))
                 }
             }
             outcome.winAmount = (winningAmount - betSize)
+            if(outcome.winAmount > 0){
+                positiveOutComes++
+            }else{
+                negativeOutComes++
+            }
             outcome.outComePercent = percent
-         //   printOutCome(outcome)
+          //  printOutCome(outcome)
 
         }
+
+        Log.i("OutcomeGenerator", "Positive: $positiveOutComes  Negative: $negativeOutComes")
 
     }
 

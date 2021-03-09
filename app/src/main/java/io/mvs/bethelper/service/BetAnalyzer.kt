@@ -9,7 +9,7 @@ class BetAnalyzer {
 
     companion object{
         private const val DIFFERENCE_MARGIN = 0.2f
-        private const val BETTING_AMOUNT = 3
+        private const val BETTING_AMOUNT = 5
     }
 
 
@@ -31,6 +31,7 @@ class BetAnalyzer {
         if(filtred.size > BETTING_AMOUNT){
            filtred = filtred.subList(0, BETTING_AMOUNT)
         }
+        println(filtred)
         return ArrayList(filtred)
     }
 
