@@ -23,6 +23,8 @@ class BetDataAdapter(private val items : ArrayList<BetData>, private  val betSiz
         holder.itemView.betPart.text = "${Math.round(betSize * data.proposedBetPart)}"
         holder.itemView.win_team_name.text = "${data.winningTeam.name}"
         holder.itemView.coef_value.text = "${data.coefficient}"
+        holder.itemView.cluster_value.text = data.targetMatch.competitionCluster
+        holder.itemView.competition_value.text = data.targetMatch.competitionName
     }
 
     override fun getItemCount() = items.size

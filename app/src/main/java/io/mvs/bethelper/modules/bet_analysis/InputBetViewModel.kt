@@ -65,8 +65,19 @@ class InputBetViewModel : ViewModel() {
                 val drawCoefficient = i.odds.drawCoefficient
 
 
-
-                val match = Match(Team(homeTeam), Team(awayTeam), i.probabilities.winHomeTeam.toFloat(), i.probabilities.winAwayTeam.toFloat(), i.probabilities.draw.toFloat(), homeTeamCoefficient.toFloat(), awayTeamCoefficient.toFloat(), drawCoefficient.toFloat(), i.start_date)
+                val match = Match(
+                    Team(homeTeam),
+                    Team(awayTeam),
+                    i.probabilities.winHomeTeam.toFloat(),
+                    i.probabilities.winAwayTeam.toFloat(),
+                    i.probabilities.draw.toFloat(),
+                    homeTeamCoefficient.toFloat(),
+                    awayTeamCoefficient.toFloat(),
+                    drawCoefficient.toFloat(),
+                    i.start_date,
+                    i.competition_cluster,
+                    i.competition_name
+                )
                 matches.add(match)
 
 //                predictionDataResponse.find {
