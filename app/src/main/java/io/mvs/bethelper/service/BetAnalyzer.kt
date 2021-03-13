@@ -10,8 +10,13 @@ class BetAnalyzer {
     companion object{
         private const val DIFFERENCE_MARGIN = 0.2f
         private const val BETTING_AMOUNT = 5
+
+    }
+    private enum  class Mode{
+        TOP_COEFFICIENT, TOP_WIN_PERSENT
     }
 
+    private var mode = Mode.TOP_COEFFICIENT
 
     fun performAnalysts(matches :  ArrayList<Match>) : ArrayList<BetData>{
         return calculateProposedPart(calculateBettingCoefficient(calculateWinningPercentCoefficient(composeBetData(filterMostProbable(matches)))))
@@ -24,7 +29,12 @@ class BetAnalyzer {
 //            filtred =  matches.filter { match -> abs(match.homeWinPercent - match.awayWinPercent) > DIFFERENCE_MARGIN - 0.05}
 //        }
 
-        filtred = filtred.sortedBy { match -> -1*abs(match.homeWinPercent - match.awayWinPercent)  }
+
+        filtred = when(mode){
+            Mode.TOP_COEFFICIENT -> filtred.sortedBy { match ->  if(match.homeWinPercent > match.awayWinPercent) -1*match.homeTeamCoefficient else  -1*match.awayTeamCoefficient  }
+            Mode.TOP_WIN_PERSENT -> filtred.sortedBy { match -> -1*abs(match.homeWinPercent - match.awayWinPercent)  }
+        }
+
         filtred.forEach { match->
             Log.i("BetAnalyzer", "Propability difference: ${abs(match.homeWinPercent - match.awayWinPercent)}")
         }
